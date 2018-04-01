@@ -1,0 +1,25 @@
+{
+  "name": "psd-for-web-developer",
+  "version": "0.1.0",
+  "description": "Photoshop document viewer made for web developer by web developer",
+  "author": "Ivan Saranin <ivan@saranin.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/isaranin/psd-for-dev",
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/isaranin/psd-for-dev/issues",
+    "email": "ivan@saranin.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/isaranin/psd-for-dev.git"
+  },
+  "engines": {
+    "node": ">= 0.11.x"
+  },
+  "keywords": [
+    "psd",
+    "layers",
+    "images"
+  ]
+}

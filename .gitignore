@@ -1,0 +1,9 @@
+/nbproject/private/
+*.tmp
+*.log
+*.bak
+*.orig
+.DS_Store
+tmp
+node_modules
+package-lock.json
