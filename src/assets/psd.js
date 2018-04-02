@@ -7934,7 +7934,7 @@ function DBCSCodec(options) {
     this.decodeTables = [];
     this.decodeTables[0] = UNASSIGNED_NODE.slice(0); // Create root node.
 
-    // Sometimes a MBCS char corresponds to a sequence of unicode chars. We store them as arrays of integers here.
+    // Sometimes a MBCS char corresponds to a sequence of unicode chars. We store them as arrays of integers here. 
     this.decodeTableSeq = [];
 
     // Actual mapping tables consist of chunks. Use them to fill up decode tables.
@@ -7943,7 +7943,7 @@ function DBCSCodec(options) {
 
     this.defaultCharUnicode = options.iconv.defaultCharUnicode;
 
-
+    
     // Encode tables: Unicode -> DBCS.
 
     // `encodeTable` is array mapping from unicode char to encoded char. All its values are integers for performance.
@@ -7952,7 +7952,7 @@ function DBCSCodec(options) {
     //         == UNASSIGNED -> no conversion found. Output a default char.
     //         <= SEQ_START  -> it's an index in encodeTableSeq, see below. The character starts a sequence.
     this.encodeTable = [];
-
+    
     // `encodeTableSeq` is used when a sequence of unicode characters is encoded as a single code. We use a tree of
     // objects where keys correspond to characters in sequence and leafs are the encoded dbcs values. A special DEF_CHAR key
     // means end of sequence (needed when one sequence is a strict subsequence of another).
@@ -7967,7 +7967,7 @@ function DBCSCodec(options) {
             for (var j = range.from; j <= range.to; j++)
                 skipEncodeChars[j] = true;
         }
-
+        
     // Use decode trie to recursively fill out encode tables.
     this._fillEncodeTable(0, 0, skipEncodeChars);
 
@@ -8004,10 +8004,10 @@ function DBCSCodec(options) {
             thirdByteNode[i] = NODE_START - fourthByteNodeIdx;
         for (var i = 0x30; i <= 0x39; i++)
             fourthByteNode[i] = GB18030_CODE
-    }
+    }        
 }
 
-// Public interface: create encoder and decoder objects.
+// Public interface: create encoder and decoder objects. 
 // The methods (write, end) are simple functions to not inhibit optimizations.
 DBCSCodec.prototype.encoder = function encoderDBCS(options) {
     return {
@@ -8018,7 +8018,7 @@ DBCSCodec.prototype.encoder = function encoderDBCS(options) {
         // Encoder state
         leadSurrogate: -1,
         seqObj: undefined,
-
+        
         // Static data
         encodeTable: this.encodeTable,
         encodeTableSeq: this.encodeTableSeq,
@@ -8109,7 +8109,7 @@ DBCSCodec.prototype._addDecodeChunk = function(chunk) {
                 else
                     writeTable[curAddr++] = code; // Basic char
             }
-        }
+        } 
         else if (typeof part === "number") { // Integer, meaning increasing sequence starting with prev character.
             var charCode = writeTable[curAddr - 1] + 1;
             for (var l = 0; l < part; l++)
@@ -8140,7 +8140,7 @@ DBCSCodec.prototype._setEncodeChar = function(uCode, dbcsCode) {
 }
 
 DBCSCodec.prototype._setEncodeSequence = function(seq, dbcsCode) {
-
+    
     // Get the root of character tree according to first character of the sequence.
     var uCode = seq[0];
     var bucket = this._getEncodeBucket(uCode);
@@ -8199,7 +8199,7 @@ DBCSCodec.prototype._fillEncodeTable = function(nodeIdx, prefix, skipEncodeChars
 
 
 function encoderDBCSWrite(str) {
-    var newBuf = new Buffer(str.length * (this.gb18030 ? 4 : 3)),
+    var newBuf = new Buffer(str.length * (this.gb18030 ? 4 : 3)), 
         leadSurrogate = this.leadSurrogate,
         seqObj = this.seqObj, nextChar = -1,
         i = 0, j = 0;
@@ -8212,7 +8212,7 @@ function encoderDBCSWrite(str) {
         }
         else {
             var uCode = nextChar;
-            nextChar = -1;
+            nextChar = -1;    
         }
 
         // 1. Handle surrogates.
@@ -8234,7 +8234,7 @@ function encoderDBCSWrite(str) {
                     // Incomplete surrogate pair - only trail surrogate found.
                     uCode = UNASSIGNED;
                 }
-
+                
             }
         }
         else if (leadSurrogate !== -1) {
@@ -8275,7 +8275,7 @@ function encoderDBCSWrite(str) {
             var subtable = this.encodeTable[uCode >> 8];
             if (subtable !== undefined)
                 dbcsCode = subtable[uCode & 0xFF];
-
+            
             if (dbcsCode <= SEQ_START) { // Sequence start
                 seqObj = this.encodeTableSeq[SEQ_START-dbcsCode];
                 continue;
@@ -8298,7 +8298,7 @@ function encoderDBCSWrite(str) {
         // 3. Write dbcsCode character.
         if (dbcsCode === UNASSIGNED)
             dbcsCode = this.defaultCharSingleByte;
-
+        
         if (dbcsCode < 0x100) {
             newBuf[j++] = dbcsCode;
         }
@@ -8345,7 +8345,7 @@ function encoderDBCSEnd() {
         newBuf[j++] = this.defaultCharSingleByte;
         this.leadSurrogate = -1;
     }
-
+    
     return newBuf.slice(0, j);
 }
 
@@ -8355,21 +8355,21 @@ function encoderDBCSEnd() {
 
 function decoderDBCSWrite(buf) {
     var newBuf = new Buffer(buf.length*2),
-        nodeIdx = this.nodeIdx,
+        nodeIdx = this.nodeIdx, 
         prevBuf = this.prevBuf, prevBufOffset = this.prevBuf.length,
         seqStart = -this.prevBuf.length, // idx of the start of current parsed sequence.
         uCode;
 
     if (prevBufOffset > 0) // Make prev buf overlap a little to make it easier to slice later.
         prevBuf = Buffer.concat([prevBuf, buf.slice(0, 10)]);
-
+    
     for (var i = 0, j = 0; i < buf.length; i++) {
         var curByte = (i >= 0) ? buf[i] : prevBuf[i + prevBufOffset];
 
         // Lookup in current trie node.
         var uCode = this.decodeTables[nodeIdx][curByte];
 
-        if (uCode >= 0) {
+        if (uCode >= 0) { 
             // Normal character, just use it.
         }
         else if (uCode === UNASSIGNED) { // Unknown char.
@@ -8401,7 +8401,7 @@ function decoderDBCSWrite(buf) {
             throw new Error("iconv-lite internal error: invalid decoding table value " + uCode + " at " + nodeIdx + "/" + curByte);
 
         // Write the character to buffer, handling higher planes using surrogate pair.
-        if (uCode > 0xFFFF) {
+        if (uCode > 0xFFFF) { 
             uCode -= 0x10000;
             var uCodeLead = 0xD800 + Math.floor(uCode / 0x400);
             newBuf[j++] = uCodeLead & 0xFF;
@@ -8466,11 +8466,11 @@ function findIdx(table, val) {
 // require()-s are direct to support Browserify.
 
 module.exports = {
-
+    
     // == Japanese/ShiftJIS ====================================================
     // All japanese encodings are based on JIS X set of standards:
     // JIS X 0201 - Single-byte encoding of ASCII + ¥ + Kana chars at 0xA1-0xDF.
-    // JIS X 0208 - Main set of 6879 characters, placed in 94x94 plane, to be encoded by 2 bytes.
+    // JIS X 0208 - Main set of 6879 characters, placed in 94x94 plane, to be encoded by 2 bytes. 
     //              Has several variations in 1978, 1983, 1990 and 1997.
     // JIS X 0212 - Supplementary plane of 6067 chars in 94x94 plane. 1990. Effectively dead.
     // JIS X 0213 - Extension and modern replacement of 0208 and 0212. Total chars: 11233.
@@ -8488,7 +8488,7 @@ module.exports = {
     //               0x8F, (0xA1-0xFE)x2 - 0212 plane (94x94).
     //  * JIS X 208: 7-bit, direct encoding of 0208. Byte ranges: 0x21-0x7E (94 values). Uncommon.
     //               Used as-is in ISO2022 family.
-    //  * ISO2022-JP: Stateful encoding, with escape sequences to switch between ASCII,
+    //  * ISO2022-JP: Stateful encoding, with escape sequences to switch between ASCII, 
     //                0201-1976 Roman, 0208-1978, 0208-1983.
     //  * ISO2022-JP-1: Adds esc seq for 0212-1990.
     //  * ISO2022-JP-2: Adds esc seq for GB2313-1980, KSX1001-1992, ISO8859-1, ISO8859-7.
@@ -8594,7 +8594,7 @@ module.exports = {
     //  * Windows CP 951: Microsoft variant of Big5-HKSCS-2001. Seems to be never public. http://me.abelcheung.org/articles/research/what-is-cp951/
     //  * Big5-2003 (Taiwan standard) almost superset of cp950.
     //  * Unicode-at-on (UAO) / Mozilla 1.8. Falling out of use on the Web. Not supported by other browsers.
-    //  * Big5-HKSCS (-2001, -2004, -2008). Hong Kong standard.
+    //  * Big5-HKSCS (-2001, -2004, -2008). Hong Kong standard. 
     //    many unicode code points moved from PUA to Supplementary plane (U+2XXXX) over the years.
     //    Plus, it has 4 combining sequences.
     //    Seems that Mozilla refused to support it for 10 yrs. https://bugzilla.mozilla.org/show_bug.cgi?id=162431 https://bugzilla.mozilla.org/show_bug.cgi?id=310299
@@ -8605,7 +8605,7 @@ module.exports = {
     //    In the encoder, it might make sense to support encoding old PUA mappings to Big5 bytes seq-s.
     //    Official spec: http://www.ogcio.gov.hk/en/business/tech_promotion/ccli/terms/doc/2003cmp_2008.txt
     //                   http://www.ogcio.gov.hk/tc/business/tech_promotion/ccli/terms/doc/hkscs-2008-big5-iso.txt
-    //
+    // 
     // Current understanding of how to deal with Big5(-HKSCS) is in the Encoding Standard, http://encoding.spec.whatwg.org/#big5-encoder
     // Unicode mapping (http://www.unicode.org/Public/MAPPINGS/OBSOLETE/EASTASIA/OTHER/BIG5.TXT) is said to be wrong.
 
@@ -8644,7 +8644,7 @@ var modules = [
     require("./dbcs-data"),
 ];
 
-// Put all encoding/alias/codec definitions to single object and export it.
+// Put all encoding/alias/codec definitions to single object and export it. 
 for (var i = 0; i < modules.length; i++) {
     var module = modules[i];
     for (var enc in module)
@@ -8701,7 +8701,7 @@ function encoderInternal() {
     return {
         write: encodeInternal,
         end: function() {},
-
+        
         enc: this.enc,
     }
 }
@@ -8741,16 +8741,16 @@ function encodeBase64End() {
 (function (Buffer){
 
 // Single-byte codec. Needs a 'chars' string parameter that contains 256 or 128 chars that
-// correspond to encoded bytes (if 128 - then lower half is ASCII).
+// correspond to encoded bytes (if 128 - then lower half is ASCII). 
 
 exports._sbcs = function(options) {
     if (!options)
         throw new Error("SBCS codec is called without the data.")
-
+    
     // Prepare char buffer for decoding.
     if (!options.chars || (options.chars.length !== 128 && options.chars.length !== 256))
         throw new Error("Encoding '"+options.type+"' has incorrect 'chars' (must be of len 128 or 256)");
-
+    
     if (options.chars.length === 128) {
         var asciiString = "";
         for (var i = 0; i < 128; i++)
@@ -8759,7 +8759,7 @@ exports._sbcs = function(options) {
     }
 
     var decodeBuf = new Buffer(options.chars, 'ucs2');
-
+    
     // Encoding buffer.
     var encodeBuf = new Buffer(65536);
     encodeBuf.fill(options.iconv.defaultCharSingleByte.charCodeAt(0));
@@ -8789,7 +8789,7 @@ function encoderSBCSWrite(str) {
     var buf = new Buffer(str.length);
     for (var i = 0; i < str.length; i++)
         buf[i] = this.encodeBuf[str.charCodeAt(i)];
-
+    
     return buf;
 }
 
@@ -8798,7 +8798,7 @@ function decoderSBCS(options) {
     return {
         write: decoderSBCSWrite,
         end: function() {},
-
+        
         decodeBuf: this.decodeBuf,
     };
 }
@@ -10795,7 +10795,7 @@ function utf16DecoderWrite(buf) {
     // Codec is not chosen yet. Accumulate initial bytes.
     this.initialBytes.push(buf);
     this.initialBytesLen += buf.length;
-
+    
     if (this.initialBytesLen < 16) // We need > 2 bytes to use space heuristic (see below)
         return '';
 
@@ -10845,7 +10845,7 @@ function utf16DecoderDecideEndianness() {
             if (buf[i] == 0x20 && buf[i+1] == 0x00) spaces[1]++;
         }
 
-        if (spaces[0] > 0 && spaces[1] == 0)
+        if (spaces[0] > 0 && spaces[1] == 0)  
             enc = 'utf-16be';
         else if (spaces[0] == 0 && spaces[1] > 0)
             enc = 'utf-16le';
@@ -10896,8 +10896,8 @@ function utf7EncoderWrite(str) {
     // Naive implementation.
     // Non-direct chars are encoded as "+<base64>-"; single "+" char is encoded as "+-".
     return new Buffer(str.replace(nonDirectChars, function(chunk) {
-        return "+" + (chunk === '+' ? '' :
-            this.iconv.encode(chunk, 'utf16-be').toString('base64').replace(/=+$/, ''))
+        return "+" + (chunk === '+' ? '' : 
+            this.iconv.encode(chunk, 'utf16-be').toString('base64').replace(/=+$/, '')) 
             + "-";
     }.bind(this)));
 }
@@ -10908,7 +10908,7 @@ var base64Chars = [];
 for (var i = 0; i < 256; i++)
     base64Chars[i] = base64Regex.test(String.fromCharCode(i));
 
-var plusChar = '+'.charCodeAt(0),
+var plusChar = '+'.charCodeAt(0), 
     minusChar = '-'.charCodeAt(0),
     andChar = '&'.charCodeAt(0);
 
@@ -11161,7 +11161,7 @@ module.exports = function (iconv) {
         original = {};
 
         var nodeNativeEncodings = {
-            'hex': true, 'utf8': true, 'utf-8': true, 'ascii': true, 'binary': true,
+            'hex': true, 'utf8': true, 'utf-8': true, 'ascii': true, 'binary': true, 
             'base64': true, 'ucs2': true, 'ucs-2': true, 'utf16le': true, 'utf-16le': true,
         };
 
@@ -11383,7 +11383,7 @@ iconv.encode = function encode(str, encoding, options) {
 
     var res = encoder.write(str);
     var trail = encoder.end();
-
+    
     return (trail && trail.length > 0) ? Buffer.concat([res, trail]) : res;
 }
 
@@ -11423,7 +11423,7 @@ iconv._codecDataCache = {};
 iconv.getCodec = function getCodec(encoding) {
     if (!iconv.encodings)
         iconv.encodings = require("../encodings"); // Lazy load all encoding definitions.
-
+    
     // Canonicalize encoding name: strip all non-alphanumeric chars and appended year.
     var enc = (''+encoding).toLowerCase().replace(/[^0-9a-z]|:\d{4}$/g, "");
 
@@ -11495,7 +11495,7 @@ var Transform = require("stream").Transform;
 
 // == Exports ==================================================================
 module.exports = function(iconv) {
-
+    
     // Additional Public API.
     iconv.encodeStream = function encodeStream(encoding, options) {
         return new IconvLiteEncoderStream(iconv.getCodec(encoding).encoder(options), options);
@@ -11590,7 +11590,7 @@ IconvLiteDecoderStream.prototype._transform = function(chunk, encoding, done) {
 IconvLiteDecoderStream.prototype._flush = function(done) {
     try {
         var res = this.conv.end();
-        if (res && res.length) this.push(res, this.encoding);
+        if (res && res.length) this.push(res, this.encoding);                
         done();
     }
     catch (e) {
@@ -11892,7 +11892,7 @@ function JSPack()
 			i != stop;
 			a[p + i] = v[rvi]>>s & 0xff, i += nsb, f++, rvi = (f < 4 ? 1 : 0), s = 24 - (8 * (f % 4)));
 	};
-
+	
 
 	// Class data
 	m._sPattern	= '(\\d+)?([AxcbBhHsfdiIlLqQ])';
@@ -18815,7 +18815,7 @@ var MATCH_TYPE = [  hashStart,
                     hashEnd,
                     multiLineArrayStart,
                     multiLineArrayEnd,
-                    property,
+                    property, 
                     propertyWithData,
                     singleLineArray,
                     boolean,
