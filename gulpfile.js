@@ -1,12 +1,14 @@
-/* eslint-disable no-console, no-process-env */
+var browserify	= require('browserify');
 var gulp		= require('gulp');
 var clean		= require('rimraf');
 var sass		= require('gulp-sass');
 var watch		= require('gulp-watch');
-var babel		= require('gulp-babel');
 var concat		= require('gulp-concat');
 var sourcemaps	= require('gulp-sourcemaps');
 var connect		= require('gulp-connect');
+var coffeeify	= require('coffeeify');
+var source		= require('vinyl-source-stream');
+var buffer		= require('vinyl-buffer');
 
 var watching	= false;
 
@@ -28,11 +30,11 @@ gulp.task('build:assets', function() {
 			.pipe(gulp.dest('./dist/samples/'))
 			.pipe(connect.reload());
 	}
-	gulp.src('./src/*.*')
+	gulp.src('./src/assets/*.html')
 		.pipe(gulp.dest('./dist'))
 		.pipe(connect.reload());
-	gulp.src('./src/js/lib/psd.js')
-		.pipe(gulp.dest('./dist/js/lib'))
+	gulp.src('./src/assets/*.js')
+		.pipe(gulp.dest('./dist/js/libs'))
 		.pipe(connect.reload());
 });
 
@@ -44,15 +46,20 @@ gulp.task('build:styles', function() {
 });
 
 gulp.task('build:scripts', function() {
-    gulp.src(['./src/js/**/*.js', '!./src/js/lib/psd.js'])
-        //.pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: ['env']
-        }))
-        //.pipe(concat('app.js'))
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('./dist/js'))
-		.pipe(connect.reload());
+	var b = browserify({
+		entries: ['./src/js/app.js'],
+		debug: development
+	});
+
+	return b
+		.exclude('psd')
+		.bundle()
+		.pipe(source('app.js'))
+		.pipe(buffer())
+		.pipe(sourcemaps.init({loadMaps: true}))
+		//.pipe(uglify())
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest('./dist/js/'));
 });
 
 gulp.task('clean', function(done) {
@@ -80,7 +87,7 @@ gulp.task('watch', function() {
 	gulp.watch('./src/js/**/*', function() {
 		gulp.run('build:scripts');
 	});
-	gulp.watch('./src/*.*', function() {
+	gulp.watch(['./src/assets/*.*', './test/psd-file'], function() {
 		gulp.run('build:assets');
 	});
 
