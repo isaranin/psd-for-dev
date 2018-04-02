@@ -23,6 +23,11 @@ gulp.task('build', [
 ]);
 
 gulp.task('build:assets', function() {
+	if (development === 'development') {
+		gulp.src('./test/psd-file/*.*')
+			.pipe(gulp.dest('./dist/samples/'))
+			.pipe(connect.reload());
+	}
 	gulp.src('./src/*.*')
 		.pipe(gulp.dest('./dist'))
 		.pipe(connect.reload());
