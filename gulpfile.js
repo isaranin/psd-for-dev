@@ -59,7 +59,8 @@ gulp.task('build:scripts', function() {
 		.pipe(sourcemaps.init({loadMaps: true}))
 		//.pipe(uglify())
 		.pipe(sourcemaps.write('./'))
-		.pipe(gulp.dest('./dist/js/'));
+		.pipe(gulp.dest('./dist/js/'))
+		.pipe(connect.reload());
 });
 
 gulp.task('clean', function(done) {
