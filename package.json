@@ -34,6 +34,7 @@
     "gulp-sourcemaps": "^2.6.4",
     "gulp-watch": "^5.0.0",
     "handlebars": "^4.0.11",
+    "hbsfy": "^2.8.1",
     "jquery": "^3.3.1",
     "rimraf": "^2.6.2",
     "rsvp": "^4.8.2",

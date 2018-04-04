@@ -9,6 +9,7 @@ var connect		= require('gulp-connect');
 var coffeeify	= require('coffeeify');
 var source		= require('vinyl-source-stream');
 var buffer		= require('vinyl-buffer');
+var hbsfy		= require('hbsfy');
 
 var watching	= false;
 
@@ -40,7 +41,9 @@ gulp.task('build:assets', function() {
 
 gulp.task('build:styles', function() {
 	return gulp.src('./src/sass/*.scss')
+		.pipe(sourcemaps.init())
 		.pipe(sass.sync().on('error', sass.logError))
+		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('./dist/css'))
 		.pipe(connect.reload());
 });
@@ -51,7 +54,12 @@ gulp.task('build:scripts', function() {
 		debug: development
 	});
 
+	hbsfy.configure({
+		extensions: ['hbs']
+	});
+
 	return b
+		.transform(hbsfy)
 		.exclude('psd')
 		.bundle()
 		.pipe(source('app.js'))
