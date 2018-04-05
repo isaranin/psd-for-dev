@@ -62,6 +62,10 @@ gulp.task('build:scripts', function() {
 		.transform(hbsfy)
 		.exclude('psd')
 		.bundle()
+		.on('error', function (error) {
+			console.error(error.toString());
+			this.emit('end');
+		})
 		.pipe(source('app.js'))
 		.pipe(buffer())
 		.pipe(sourcemaps.init({loadMaps: true}))
