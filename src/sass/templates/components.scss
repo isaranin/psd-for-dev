@@ -1,11 +1,10 @@
-
 // app component
 #psd-for-dev {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background: darken(white, 10%);
-
+	background-color: lighten(black, 30%);
+	text-shadow: 0px 0px 2px rgba(black, 1);
 	& > div {
 		display: none;
 	}
@@ -45,5 +44,14 @@
 		& #working-space {
 			display: flex;
 		}
+	}
+}
+
+//button
+.button {
+	color: rgba(darken(white, 20%), 0.8);
+	transition: color 0.5s;
+	&:hover {
+		color: darken(white, 5%);
 	}
 }

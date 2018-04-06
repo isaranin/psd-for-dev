@@ -1,37 +1,86 @@
 #psd-layer-list {
+	padding: 5px 8px;
+	box-shadow: 0 0 15px rgba(black, 0.5);
+	background: lighten(black, 28%);
+	color: darken(white, 5%);
+	font-size: 1em;
+	letter-spacing: 0.04em;
+	overflow-y: auto;
+
+	&::-webkit-scrollbar {
+		width: 7px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: rgba(black, 0);
+	}
+
+	&::-webkit-scrollbar-thumb {
+		border-radius: 5px;
+		background-color: rgba(lighten(black, 50%), 0.5);
+		transition: background-color 0.5s;
+		&:hover {
+			background-color: rgba(lighten(black, 70%), 0.6);
+		}
+	}
+	
 	& .layer-list {
 		list-style: none;
 		margin-left: 0;
 		padding-left: 0;
-		& .button {
-			cursor: pointer;
-			display: none;
-		}
-		& .layer {
-			border: 1px solid rgba(red, 0);
-			&.hover {
-				border-color: red;
-			}
-		}
-
-		& .button-visible {
-			@include ico(eye);
-		}
-
-		& .button-fold {
-			@include ico(folder);
-			display: none;
-		}
 
 		& .layer{
+			padding: 1px 4px;
+			transition: background-color 0.5s;
+
+
+			&.hover {
+				border-radius: 2px;
+				background-color: rgba(lighten(black, 35%), 1);
+			}
+
+			& .button {
+				font-size: 0.85em;
+				cursor: pointer;
+				display: none;
+				vertical-align: middle;
+				padding: 0 1px;
+				margin: 0;
+			}
+			& .button-visible {
+				@include ico(eye);
+			}
+			& .button-fold {
+				@include ico(folder);
+				display: none;
+			}
+
+			& .title {
+				vertical-align: middle;
+				cursor: default;
+				transition: color 0.5s;
+				margin-left:0.5em;
+
+			}
+
 			& .layer-list {
 				display: none;
-				padding-left: 1em;
+				padding-left: 0;
+				margin-left: -4px;
+				margin-right: -4px;
 			}
+			& .layer {
+				padding-left: 15px;
+
+			}
+
 			&.layer-hided{
-				color: grey;
+				color: lighten(black, 45%);
 				&>.button-visible {
 					@include ico(eye-slash);
+				}
+				& .layer .button-visible {
+					color: lighten(black, 45%);
 				}
 			}
 			&.layer-group{

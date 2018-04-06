@@ -5,21 +5,28 @@ $layer-margin: 10px;
     justify-content: center;
     align-items: center;
 	overflow: hidden;
+
 	& .image-view {
 		margin: $layer-margin;
 		position: relative;
+		box-shadow: 0 0 20px rgba(black, 0.5);
+		border: 1px solid rgba(black, 0.5);
 		& .layer {
 			display: none;
 			position: absolute;
 			padding: $layer-margin;
 			margin: -$layer-margin;
-			border: 1px solid rgba(red, 0);
+			//border: 1px dashed rgba(red, 0);
 			box-sizing: content-box;
 			&.is-visible {
 				display: block;
 			}
 			&.hover {
-				border-color: red;
+				//border-color: rgba(darken(white, 50%), 0.5);
+				@include marching-ants(6px, 1px, 1s, rgba(darken(white, 50%), 0.8), rgba(white, 0.8));
+			}
+			&.group-layer {
+				margin: 0;
 			}
 		}
 	}
