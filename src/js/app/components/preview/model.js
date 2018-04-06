@@ -6,7 +6,9 @@ module.exports = Backbone.Model.extend({
 
 	defaults: function() {
 		return {
-			status: 'start',
+			zoom: 1,
+			left: 0,
+			top: 0,
 			psd: null
 		};
 	},

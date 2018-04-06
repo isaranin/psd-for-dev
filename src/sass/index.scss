@@ -2,4 +2,20 @@
   Style index
 */
 
+@import "libs/fontawesome/fontawesome";
+@import "libs/fontawesome/fa-solid.scss";
+@import "libs/fontawesome/fa-brands.scss";
+
+@import "libs/bootstrap/bootstrap";
+
+@import "mixins/spinner.scss";
+@import "mixins/ico.scss";
+
+@import "templates/addons.scss";
+
+@import "templates/components.scss";
+
 @import "templates/layout.scss";
+
+@import "templates/preview.scss";
+@import "templates/layer-list.scss";

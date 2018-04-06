@@ -2,6 +2,22 @@
   Style layout
 */
 
-html {
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+html,
+body {
 	margin: 0;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	font-family: 'Raleway', sans-serif;
+}
+
+#working-space {
+	#psd-preview {
+		width: 80%;
+	}
+	#psd-layer-list {
+		width: 20%;
+	}
 }

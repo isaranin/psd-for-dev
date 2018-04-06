@@ -1,0 +1,49 @@
+
+// app component
+#psd-for-dev {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: darken(white, 10%);
+
+	& > div {
+		display: none;
+	}
+
+	& .msg {
+		border: 2px dotted darken(white, 35%);
+		border-radius: 5px;
+		padding: 20px;
+		font-size: 20px;
+	}
+
+	& #msg-start {
+		padding: 10vw 10vh;
+	}
+
+	& #msg-loading {
+		//padding: 10vw 10vh;
+		border: none;
+
+		@include spinner(darken(white, 35%), 12px);
+		& .spinner {
+			margin: 10px;
+		}
+	}
+
+	&[data-status='start'] {
+		& #msg-start {
+			display: block;
+		}
+	}
+	&[data-status='loading'] {
+		& #msg-loading {
+			display: block;
+		}
+	}
+	&[data-status='loaded'] {
+		& #working-space {
+			display: flex;
+		}
+	}
+}

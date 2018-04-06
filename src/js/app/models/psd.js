@@ -1,25 +1,27 @@
 var Backbone = require('backbone');
 var _ = require('underscore');
-var PSDModel = require('models/psd');
+var LayersModel = require('components/layers/model');
 
 module.exports = Backbone.Model.extend({
 
 	defaults: function() {
 		return {
-			status: 'start',
-			psd: null
+			width: 0,
+			height: 0,
+			layers: null
 		};
 	},
 
 	constructor: function() {
 		Backbone.Model.apply(this, arguments);
-		if (_.isNull(this.attributes.psd)) {
-			this.attributes.psd = new PSDModel();
+		if (_.isNull(this.attributes.layers)) {
+			this.attributes.layers = new LayersModel();
 		}
 	},
 
 	parse: function(data, options) {
-		this.psd.reset(data.psd);
+		this.layers.reset(data.layers);
 		return data.library;
 	}
 });
+

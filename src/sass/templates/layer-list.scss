@@ -1,0 +1,53 @@
+#psd-layer-list {
+	& .layer-list {
+		list-style: none;
+		margin-left: 0;
+		padding-left: 0;
+		& .button {
+			cursor: pointer;
+			display: none;
+		}
+		& .layer {
+			border: 1px solid rgba(red, 0);
+			&.hover {
+				border-color: red;
+			}
+		}
+
+		& .button-visible {
+			@include ico(eye);
+		}
+
+		& .button-fold {
+			@include ico(folder);
+			display: none;
+		}
+
+		& .layer{
+			& .layer-list {
+				display: none;
+				padding-left: 1em;
+			}
+			&.layer-hided{
+				color: grey;
+				&>.button-visible {
+					@include ico(eye-slash);
+				}
+			}
+			&.layer-group{
+				&>.button-fold {
+					display: inline-block;
+				}
+				&.layer-folded{
+
+					&>.button-fold {
+						@include ico(folder-open);
+					}
+					&>.layer-list {
+						display: block;
+					}
+				}
+			}
+		}
+	}
+}
