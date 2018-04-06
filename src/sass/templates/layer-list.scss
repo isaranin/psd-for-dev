@@ -5,7 +5,9 @@
 	font-size: 1em;
 	letter-spacing: 0.04em;
 	overflow-y: auto;
-
+	overflow-x: hidden;
+	z-index: 2;
+	
 	&::-webkit-scrollbar {
 		width: 7px;
 	}
@@ -30,8 +32,11 @@
 
 		& .layer{
 			padding: 1px 4px;
+			padding-right: 0;
 			transition: background-color 0.5s;
-
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 
 			&.hover {
 				border-radius: 2px;
@@ -59,7 +64,6 @@
 				cursor: default;
 				transition: color 0.5s;
 				margin-left:0.5em;
-
 			}
 
 			& .layer-list {

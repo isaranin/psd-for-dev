@@ -49,6 +49,7 @@ module.exports = Backbone.View.extend({
 		} else if (zoom < 0.01) {
 			zoom = 0.5;
 		}
+		event.preventDefault();
 		this.model.set('zoom', zoom);
 	},
 

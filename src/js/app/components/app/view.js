@@ -1,5 +1,5 @@
 var Backbone = require('backbone');
-var $ = require('jquery');
+var _ = require('underscore');
 var template = require('./template.hbs');
 var PreviewModel = require('components/preview/model');
 var PreviewView = require('components/preview/view');
@@ -52,6 +52,28 @@ module.exports = Backbone.View.extend({
 		return this;
 	},
 
+	loadPSD: function(obj) {
+		this.model.set('status', 'loading');
+
+		var loader = null;
+		if (_.isString(obj)) {
+			loader = PSD.fromURL(obj);
+		} else {
+			loader = PSD.fromEvent(obj);
+		}
+		var that = this;
+		loader.then(function(psd) {
+			var converter = new PSDConverter();
+			that.model.get('psd').get('layers').reset();
+			if (converter.modelFromPSDFile(that.model.get('psd'), psd)) {
+				that.model.set('status', 'loaded');
+			} else {
+				that.model.set('status', 'error');
+			}
+			that.render();
+		});
+	},
+
 	onChangeStatus: function() {
 		this.$el.attr({'data-status': this.model.get('status')});
 	},
@@ -68,16 +90,6 @@ module.exports = Backbone.View.extend({
 	onDrop: function(e) {
 		e.preventDefault();
 		this.model.set('status', 'loading');
-		var that = this;
-		PSD.fromEvent(e.originalEvent).then(function(psd) {
-			var converter = new PSDConverter();
-			that.model.get('psd').get('layers').reset();
-			if (converter.modelFromPSDFile(that.model.get('psd'), psd)) {
-				that.model.set('status', 'loaded');
-			} else {
-				that.model.set('status', 'error');
-			}
-			that.render();
-		});
+		this.loadPSD(e.originalEvent);
 	}
 });

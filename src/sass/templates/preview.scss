@@ -5,7 +5,7 @@ $layer-margin: 10px;
     justify-content: center;
     align-items: center;
 	overflow: hidden;
-
+	z-index: 1;
 	& .image-view {
 		margin: $layer-margin;
 		position: relative;
