@@ -10,7 +10,7 @@ module.exports = Backbone.View.extend({
 	template: template,
 
 	initialize: function() {
-		this.listenTo(this.model, 'add remove', _.debounce(_.bind(this.render, this), 200));
+		//this.listenTo(this.model, 'add remove', _.debounce(_.bind(this.render, this), 200));
 	},
 
 	render: function() {

@@ -51,27 +51,24 @@ module.exports = Backbone.View.extend({
 
 		return this;
 	},
+	convertPSD: function(psd) {
+		var converter = new PSDConverter();
+		this.model.get('psd').get('layers').reset();
+		if (converter.modelFromPSDFile(this.model.get('psd'), psd)) {
+			this.model.set('status', 'loaded');
+		} else {
+			this.model.set('status', 'error');
+		}
+		this.render();
+	},
 
 	loadPSD: function(obj) {
 		this.model.set('status', 'loading');
-
-		var loader = null;
 		if (_.isString(obj)) {
-			loader = PSD.fromURL(obj);
+			PSD.fromURL(obj).then(_.bind(this.convertPSD, this));
 		} else {
-			loader = PSD.fromEvent(obj);
+			PSD.fromEvent(obj).then(_.bind(this.convertPSD, this));
 		}
-		var that = this;
-		loader.then(function(psd) {
-			var converter = new PSDConverter();
-			that.model.get('psd').get('layers').reset();
-			if (converter.modelFromPSDFile(that.model.get('psd'), psd)) {
-				that.model.set('status', 'loaded');
-			} else {
-				that.model.set('status', 'error');
-			}
-			that.render();
-		});
 	},
 
 	onChangeStatus: function() {

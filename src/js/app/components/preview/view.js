@@ -9,7 +9,8 @@ module.exports = Backbone.View.extend({
 	template: template,
 
 	events: {
-		'mousewheel': 'onMouseWheel'
+		'mousewheel': 'onMouseWheel',
+		'DOMMouseScroll': 'onMouseWheel'
 	},
 	// nested views
 	views: {
@@ -43,6 +44,7 @@ module.exports = Backbone.View.extend({
 
 	onMouseWheel: function(event) {
 		var zoom = this.model.get('zoom');
+		console.log(event.originalEvent.wheelDelta);
 		zoom += event.originalEvent.wheelDelta*this.zoomPower;
 		if (zoom > 100) {
 			zoom = 8;
