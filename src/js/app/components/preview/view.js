@@ -8,16 +8,12 @@ module.exports = Backbone.View.extend({
 	className: 'image-view',
 	template: template,
 
-	events: {
-		'mousewheel': 'onMouseWheel',
-		'DOMMouseScroll': 'onMouseWheel'
-	},
 	// nested views
 	views: {
 		layerslist: null
 	},
 
-	zoomPower: 0.001,
+    zoomPower: 0.001,
 
 	initialize: function() {
 		this.listenTo(this.model, 'change', this.onChangeCss);
@@ -42,24 +38,26 @@ module.exports = Backbone.View.extend({
 		return this;
 	},
 
-	onMouseWheel: function(event) {
+	increaseZoom: function(delta) {
 		var zoom = this.model.get('zoom');
-		console.log(event.originalEvent.wheelDelta);
-		zoom += event.originalEvent.wheelDelta*this.zoomPower;
+		zoom += delta*this.zoomPower;
 		if (zoom > 100) {
 			zoom = 8;
-		} else if (zoom < 0.01) {
+		} else if (zoom < 0.5) {
 			zoom = 0.5;
 		}
-		event.preventDefault();
 		this.model.set('zoom', zoom);
+	},
+
+	setPosition: function(x, y) {
+		this.model.set({'left': x, 'top': y});
 	},
 
 	onChangeCss: function() {
 		this.$el.css({
-			'left': this.model.get('left'),
-			'top': this.model.get('top'),
-			'zoom': this.model.get('zoom')
+			'transform':
+					'translate('+this.model.get('left')+'px,'+this.model.get('top')+'px) '+
+					'scale('+this.model.get('zoom')+')'
 		});
 	}
 });

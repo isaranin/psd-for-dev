@@ -23,7 +23,17 @@ module.exports = Backbone.View.extend({
 	events: {
 		'dragover': 'onDragStart',
 		'dragleave': 'onDragEnd',
-		'drop': 'onDrop'
+		'drop': 'onDrop',
+		'mousewheel #psd-preview': 'onMouseWheelPreview',
+		'mousedown #psd-preview': 'onMouseDownPreview',
+		'mousemove #psd-preview': 'onMouseMovePreview',
+		'mouseup #psd-preview': 'onMouseUpPreview'
+	},
+
+	imageDrag: {
+		dragging: false,
+		offsetX: 0,
+		offsetY: 0
 	},
 
 	initialize: function() {
@@ -51,6 +61,7 @@ module.exports = Backbone.View.extend({
 
 		return this;
 	},
+
 	convertPSD: function(psd) {
 		var converter = new PSDConverter();
 		this.model.get('psd').get('layers').reset();
@@ -88,5 +99,33 @@ module.exports = Backbone.View.extend({
 		e.preventDefault();
 		this.model.set('status', 'loading');
 		this.loadPSD(e.originalEvent);
+	},
+
+	onMouseWheelPreview: function(event) {
+		this.views.preview.increaseZoom(event.originalEvent.wheelDelta);
+		event.preventDefault();
+	},
+
+	onMouseDownPreview: function(event) {
+		if (event.which === 1) {
+			this.imageDrag.dragging = true;
+			this.imageDrag.offsetX = event.originalEvent.clientX;
+			this.imageDrag.offsetY = event.originalEvent.clientY;
+		}
+	},
+
+	onMouseUpPreview: function(event) {
+		if (event.which === 1) {
+			this.imageDrag.dragging = false;
+		}
+	},
+
+	onMouseMovePreview: function(event) {
+		if (event.which === 1 && this.imageDrag.dragging) {
+			this.views.preview.setPosition(
+				-this.imageDrag.offsetX+event.originalEvent.clientX,
+				-this.imageDrag.offsetY+event.originalEvent.clientY);
+		}
 	}
+
 });

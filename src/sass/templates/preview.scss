@@ -11,6 +11,8 @@ $layer-margin: 10px;
 		position: relative;
 		box-shadow: 0 0 20px rgba(black, 0.5);
 		border: 1px solid rgba(black, 0.5);
+		overflow: hidden;
+		//transition: transform 0.1s;
 		& .layer {
 			display: none;
 			position: absolute;
