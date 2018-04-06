@@ -5,6 +5,9 @@ var PreviewModel = require('components/preview/model');
 var PreviewView = require('components/preview/view');
 var LayersListView = require('components/layers/listview/view');
 
+var PSD = require('psd');
+var PSDConverter = require('modules/psdconverter');
+
 module.exports = Backbone.View.extend({
 
 	el: '#psd-for-dev',
@@ -15,6 +18,12 @@ module.exports = Backbone.View.extend({
 	views: {
 		preview: null,
 		layerslist: null
+	},
+
+	events: {
+		'dragover': 'onDragStart',
+		'dragleave': 'onDragEnd',
+		'drop': 'onDrop'
 	},
 
 	initialize: function() {
@@ -45,5 +54,30 @@ module.exports = Backbone.View.extend({
 
 	onChangeStatus: function() {
 		this.$el.attr({'data-status': this.model.get('status')});
+	},
+
+	onDragStart: function(e) {
+		this.model.set('status', 'drag-over');
+		e.preventDefault();
+	},
+
+	onDragEnd: function(e) {
+		this.model.set('status', 'start');
+	},
+
+	onDrop: function(e) {
+		e.preventDefault();
+		this.model.set('status', 'loading');
+		var that = this;
+		PSD.fromEvent(e.originalEvent).then(function(psd) {
+			var converter = new PSDConverter();
+			that.model.get('psd').get('layers').reset();
+			if (converter.modelFromPSDFile(that.model.get('psd'), psd)) {
+				that.model.set('status', 'loaded');
+			} else {
+				that.model.set('status', 'error');
+			}
+			that.render();
+		});
 	}
 });

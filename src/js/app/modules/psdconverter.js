@@ -1,27 +1,34 @@
 var LayerModel = require('components/layer/model');
+var _ = require('underscore');
 
 module.exports = function() {
 	var obj = {
 		modelFromPSDFile: function(model, psdFile) {
+			if ((psdFile.header.width === 0)
+				|| (psdFile.header.height === 0)
+				|| (_.isNaN(psdFile.file.pos))) {
+				return false;
+			}
 			var root = psdFile.tree(),
 				index = 0;
 			model.set('width', psdFile.header.width);
 			model.set('height', psdFile.header.height);
-			this.fillLayerGroup(root.children(), model.attributes.layers, index);
+			this.fillLayerGroup(root.children(), model.attributes.layers);
+			return true;
 		},
 		fillLayerGroup: function(origLayerGroup, destLayerGoup, index) {
 			var that = this;
 			origLayerGroup.map(function(origLayer) {
 				var newLayer = new LayerModel();
-				that.fillLayer(origLayer, newLayer, index++);
+				that.fillLayer(origLayer, newLayer);
 				if (newLayer.get('group')) {
-					index = that.fillLayerGroup(origLayer.children(), newLayer.get('layers'), index);
+					that.fillLayerGroup(origLayer.children(), newLayer.get('layers'));
 				}
 				destLayerGoup.push(newLayer);
 				return index;
 			});
 		},
-		fillLayer: function(origLayer, destLayer, index) {
+		fillLayer: function(origLayer, destLayer) {
 			destLayer.set({
 				visible: origLayer.visible() !== false,
 				group: origLayer.isGroup(),
@@ -30,7 +37,6 @@ module.exports = function() {
 				top: origLayer.top,
 				width: origLayer.width,
 				height: origLayer.height,
-				zindex: 10000-index,
 				fold: true
 			});
 			if (!destLayer.get('group')

@@ -2,7 +2,6 @@
 	padding: 5px 8px;
 	box-shadow: 0 0 15px rgba(black, 0.5);
 	background: lighten(black, 28%);
-	color: darken(white, 5%);
 	font-size: 1em;
 	letter-spacing: 0.04em;
 	overflow-y: auto;
@@ -23,7 +22,7 @@
 			background-color: rgba(lighten(black, 70%), 0.6);
 		}
 	}
-	
+
 	& .layer-list {
 		list-style: none;
 		margin-left: 0;
