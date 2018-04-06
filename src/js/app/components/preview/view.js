@@ -1,6 +1,5 @@
 var Backbone = require('backbone');
 var template = require('./template.hbs');
-var LayerPreviewView = require('components/layer/preview/view');
 var LayersPreviewView = require('components/layers/preview/view');
 
 module.exports = Backbone.View.extend({
@@ -13,7 +12,7 @@ module.exports = Backbone.View.extend({
 		layerslist: null
 	},
 
-    zoomPower: 0.001,
+    zoomPower: 0.1,
 
 	initialize: function() {
 		this.listenTo(this.model, 'change', this.onChangeCss);
@@ -39,25 +38,32 @@ module.exports = Backbone.View.extend({
 	},
 
 	increaseZoom: function(delta) {
-		var zoom = this.model.get('zoom');
-		zoom += delta*this.zoomPower;
+		//todo: make zoom work around mouse pointer
+		var zoom = this.model.get('zoom'),
+			left = this.model.get('left'),
+			top = this.model.get('top'),
+			zoomChange = zoom;
+		zoom *= Math.exp(delta/120*this.zoomPower);
 		if (zoom > 100) {
 			zoom = 8;
 		} else if (zoom < 0.5) {
 			zoom = 0.5;
 		}
-		this.model.set('zoom', zoom);
+		zoomChange -= zoom;
+		//left = left * zoomChange;
+		//top = top * zoomChange;
+		this.model.set({'zoom': zoom, 'left': left, 'top': top});
 	},
 
 	setPosition: function(x, y) {
+		//todo: add bounds
 		this.model.set({'left': x, 'top': y});
 	},
 
 	onChangeCss: function() {
 		this.$el.css({
-			'transform':
-					'translate('+this.model.get('left')+'px,'+this.model.get('top')+'px) '+
-					'scale('+this.model.get('zoom')+')'
+			'transform': 'matrix('+this.model.get('zoom')+',0,0,'+this.model.get('zoom')+','+
+						 this.model.get('left')+','+this.model.get('top')+')'
 		});
 	}
 });

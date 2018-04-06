@@ -109,8 +109,10 @@ module.exports = Backbone.View.extend({
 	onMouseDownPreview: function(event) {
 		if (event.which === 1) {
 			this.imageDrag.dragging = true;
-			this.imageDrag.offsetX = event.originalEvent.clientX;
-			this.imageDrag.offsetY = event.originalEvent.clientY;
+			this.imageDrag.offsetX = event.originalEvent.screenX;
+			this.imageDrag.offsetY = event.originalEvent.screenY;
+			this.imageDrag.offsetX -= this.views.preview.model.get('left');
+			this.imageDrag.offsetY -= this.views.preview.model.get('top');
 		}
 	},
 
@@ -123,8 +125,8 @@ module.exports = Backbone.View.extend({
 	onMouseMovePreview: function(event) {
 		if (event.which === 1 && this.imageDrag.dragging) {
 			this.views.preview.setPosition(
-				-this.imageDrag.offsetX+event.originalEvent.clientX,
-				-this.imageDrag.offsetY+event.originalEvent.clientY);
+				-this.imageDrag.offsetX+event.originalEvent.screenX,
+				-this.imageDrag.offsetY+event.originalEvent.screenY);
 		}
 	}
 
