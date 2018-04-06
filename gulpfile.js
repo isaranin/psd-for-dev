@@ -37,6 +37,9 @@ gulp.task('build:assets', function() {
 	gulp.src('./src/assets/*.js')
 		.pipe(gulp.dest('./dist/js/libs'))
 		.pipe(connect.reload());
+	gulp.src('./src/assets/fonts/**')
+		.pipe(gulp.dest('./dist/css/fonts'))
+		.pipe(connect.reload());
 });
 
 gulp.task('build:styles', function() {
@@ -50,7 +53,8 @@ gulp.task('build:styles', function() {
 
 gulp.task('build:scripts', function() {
 	var b = browserify({
-		entries: ['./src/js/app.js'],
+		entries: './src/js/app.js',
+		paths: ['./src/js/app/'],
 		debug: development
 	});
 
@@ -100,7 +104,7 @@ gulp.task('watch', function() {
 	gulp.watch('./src/js/**/*', function() {
 		gulp.run('build:scripts');
 	});
-	gulp.watch(['./src/assets/*.*', './test/psd-file'], function() {
+	gulp.watch(['./src/assets/*.*', './test/psd-file/*.*'], function() {
 		gulp.run('build:assets');
 	});
 
