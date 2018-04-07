@@ -1,10 +1,13 @@
 /.git
 /nbproject
+/node_modules
+/src
 /test
 /db
 /docs
-/node_modules
-/src
-license
+.gitignore
+LICENSE
+README.md
 gulpfile.js
+package-lock.json
 package.json
