@@ -171,20 +171,15 @@ gulp.task('deploy:bump', function(done) {
 		.pipe(gulp.dest('./'));
 });
 
-gulp.task('deploy:push', function() {
+gulp.task('deploy:commit', function() {
 	return gulp.src(['./package.json', './dist/**/*'])
 		.pipe(git.commit('auto deploy new version'), {args: '-f'})
 		.pipe(filter('package.json'))
 		.pipe(tagVersion());
-//		.pipe(git.push(
-//			'origin',
-//			{args: '--all --tags'},
-//			function (err) {
-//				if (err) {
-//					console.error(err.toString());
-//				}
-//			}
-//		));
+});
+
+gulp.task('deploy:push', function() {
+	return git.push('origin', {args: '--tags'});
 });
 
 // task for deployement
@@ -192,6 +187,7 @@ gulp.task('deploy', function(cb) {
 	dev = false;
 	runSequence(
 		['deploy:bump', 'build'],
+		'deploy:commit',
 		'deploy:push',
 		cb);
 
