@@ -9,10 +9,12 @@ module.exports = function() {
 				|| (_.isNaN(psdFile.file.pos))) {
 				return false;
 			}
-			var root = psdFile.tree(),
-				index = 0;
-			model.set('width', psdFile.header.width);
-			model.set('height', psdFile.header.height);
+			var root = psdFile.tree();
+			model.set({
+				'width': psdFile.header.width,
+				'height': psdFile.header.height,
+				'loaded': true
+			});
 			this.fillLayerGroup(root.children(), model.attributes.layers);
 			return true;
 		},

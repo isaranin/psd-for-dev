@@ -19,6 +19,9 @@
 		font-size: 20px;
 		text-align: center;
 		padding: 10vw 10vh;
+		pointer-events: none;
+		max-width: 60%;
+		word-wrap: break-word;
 	}
 
 	& #msg-start {
@@ -27,13 +30,17 @@
 	}
 
 	& #msg-loading {
-		//padding: 10vw 10vh;
 		border: none;
-
 		@include spinner(darken(white, 35%), 12px);
 		& .spinner {
 			margin: 10px;
 		}
+	}
+
+	& #msg-drop {
+		transition: opacity 0.8s;
+		opacity: 0;
+		background-color: rgba(lighten(black, 60%), 0.8);
 	}
 
 	&[data-status='start'] {
@@ -51,25 +58,27 @@
 			display: flex;
 		}
 	}
-	&[data-status='error'] {
-		& #msg-error {
+	&[data-status='message'] {
+		& #msg-message {
 			display: block;
 		}
 	}
 	&[data-status='drag-over'] {
 		background-color: lighten(black, 20%);
-		& #msg-start {
+		& #msg-drop {
 			display: block;
-			background-color: rgba(lighten(black, 60%), 0.8);
+			opacity: 1;
 		}
 	}
 }
 
 //button
-.button {
+.button,
+a {
 	color: rgba(darken(white, 20%), 0.8);
 	transition: color 0.5s;
 	&:hover {
 		color: darken(white, 5%);
 	}
+	pointer-events: auto;
 }

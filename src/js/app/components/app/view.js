@@ -21,7 +21,8 @@ module.exports = Backbone.View.extend({
 	},
 
 	events: {
-		'dragover': 'onDragStart',
+		'dragenter': 'onDragStart',
+		'dragover': 'onDragOver',
 		'dragleave': 'onDragEnd',
 		'drop': 'onDrop',
 		'mousewheel #psd-preview': 'onMouseWheelPreview',
@@ -38,6 +39,8 @@ module.exports = Backbone.View.extend({
 
 	initialize: function() {
 		this.listenTo(this.model, 'change:status', this.onChangeStatus);
+		this.listenTo(this.model, 'change:message', this.onChangeMessage);
+
 		this.views.preview = new PreviewView({
 			model: new PreviewModel({psd: this.model.get('psd')})
 		});
@@ -64,40 +67,103 @@ module.exports = Backbone.View.extend({
 
 	convertPSD: function(psd) {
 		var converter = new PSDConverter();
-		this.model.get('psd').get('layers').reset();
+		this.model.get('psd').reset();
 		if (converter.modelFromPSDFile(this.model.get('psd'), psd)) {
 			this.model.set('status', 'loaded');
 		} else {
-			this.model.set('status', 'error');
+			this.model.set({
+				'status':'message',
+				'message': 'Wrong file format.'
+			});
 		}
 		this.render();
 	},
 
 	loadPSD: function(obj) {
 		this.model.set('status', 'loading');
-		if (_.isString(obj)) {
-			PSD.fromURL(obj).then(_.bind(this.convertPSD, this));
-		} else {
-			PSD.fromEvent(obj).then(_.bind(this.convertPSD, this));
+
+		var func = null,
+			param = null;
+		if (obj instanceof DragEvent) {
+			var dragItems = obj.dataTransfer.items;
+			if (dragItems.length !== 1) {
+				this.model.set({
+					'message': 'You add to much files at once.',
+					'status': 'message'
+				});
+				return;
+			} else if (dragItems[0].kind === 'file') {
+				func = 'fromEvent';
+				param = obj;
+			} else if (dragItems[0].kind == 'string') {
+				func = 'fromURL';
+				param = obj.dataTransfer.getData('text');
+			}
+		} else if (_.isString(obj)) {
+			func = 'fromURL';
+			param = obj;
 		}
+		if (_.isNull(func)
+			|| _.isNull(param)) {
+			this.model.set({
+				'message': 'You add wrong file.',
+				'status': 'message'
+			});
+			console.log(obj);
+		} else {
+			PSD[func](param).then(
+				_.bind(this.convertPSD, this),
+				_.bind(function(e) {this.onLoadError(e.currentTarget.error.message); }, this));
+		}
+	},
+
+	onLoadError: function(error) {
+		this.model.set({
+				'message': 'Error: '+error,
+				'status': 'message'
+			});
 	},
 
 	onChangeStatus: function() {
 		this.$el.attr({'data-status': this.model.get('status')});
 	},
 
+	onChangeMessage: function() {
+		this.$('#msg-message').html(this.model.get('message'));
+	},
+
 	onDragStart: function(e) {
+		e.preventDefault();
+		var dragItems = e.originalEvent.dataTransfer.items;
+		if ((dragItems.length !== 1)
+			|| ((dragItems[0].kind !== 'file')
+				&& (dragItems[0].kind !== 'string'))) {
+			this.model.set({
+				'message': 'Drop only one file or link.',
+				'status': 'message'
+			});
+			e.originalEvent.dataTransfer.effectAllowed = 'none';
+			return false;
+		}
 		this.model.set('status', 'drag-over');
+	},
+
+	onDragOver: function(e) {
 		e.preventDefault();
 	},
 
 	onDragEnd: function(e) {
-		this.model.set('status', 'start');
+		if (e.target === this.el) {
+			if (this.model.get('psd').get('loaded')) {
+				this.model.set('status', 'loaded');
+			} else {
+				this.model.set('status', 'start');
+			}
+		}
 	},
 
 	onDrop: function(e) {
 		e.preventDefault();
-		this.model.set('status', 'loading');
 		this.loadPSD(e.originalEvent);
 	},
 

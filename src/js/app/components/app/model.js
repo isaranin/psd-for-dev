@@ -7,7 +7,12 @@ module.exports = Backbone.Model.extend({
 	defaults: function() {
 		return {
 			status: 'start',
-			psd: null
+			message: '',
+			siteUrl: window.location.origin,
+			helpUrl: 'https://github.com/isaranin/psd-for-dev/issues',
+			author: 'Ivan Saranin',
+			authorEmail: 'ivan@saranin.co',
+			psd: null,
 		};
 	},
 

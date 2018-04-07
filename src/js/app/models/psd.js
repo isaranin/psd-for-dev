@@ -8,6 +8,7 @@ module.exports = Backbone.Model.extend({
 		return {
 			width: 0,
 			height: 0,
+			loaded: false,
 			layers: null
 		};
 	},
@@ -22,6 +23,13 @@ module.exports = Backbone.Model.extend({
 	parse: function(data, options) {
 		this.layers.reset(data.layers);
 		return data.library;
+	},
+
+	reset: function() {
+		var layers = this.attributes.layers;
+		layers.reset();
+		this.clear().set(this.defaults());
+		this.attributes.layers = layers;
 	}
 });
 
