@@ -25,21 +25,23 @@
   "devDependencies": {
     "backbone": "^1.3.3",
     "browserify": "^16.1.1",
-    "coffeeify": "^1.2.0",
-    "coffescript": "0.0.1-security",
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.1",
+    "gulp-bump": "^3.1.0",
+    "gulp-clean": "^0.4.0",
     "gulp-connect": "^5.5.0",
+    "gulp-git": "^2.5.2",
+    "gulp-if": "^2.0.2",
     "gulp-sass": "^3.2.1",
     "gulp-sourcemaps": "^2.6.4",
-    "gulp-watch": "^5.0.0",
+    "gulp-tag-version": "^1.3.1",
+    "gulp-uglify": "^3.0.0",
     "handlebars": "^4.0.11",
     "hbsfy": "^2.8.1",
     "jquery": "^3.3.1",
-    "rimraf": "^2.6.2",
-    "rsvp": "^4.8.2",
+    "run-sequence": "^2.2.1",
     "underscore": "^1.8.3",
     "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0"
+    "vinyl-source-stream": "^2.0.0",
+    "yargs": "^11.0.0"
   }
 }
