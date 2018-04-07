@@ -15,6 +15,7 @@ var hbsfy		= require('hbsfy');
 
 var git			= require('gulp-git');
 var bump		= require('gulp-bump');
+var filter		= require('gulp-filter');
 var tagVersion	= require('gulp-tag-version');
 var runSequence	= require('run-sequence');
 
@@ -172,8 +173,9 @@ gulp.task('deploy:bump', function(done) {
 
 gulp.task('deploy:push', function() {
 	return gulp.src(['./package.json', './dist/**/*'])
-		.pipe(git.commit('auto deploy new version'), {args: '-f'});
-//		.pipe(tagVersion())
+		.pipe(git.commit('auto deploy new version'), {args: '-f'})
+		.pipe(filter('package.json'))
+		.pipe(tagVersion());
 //		.pipe(git.push(
 //			'origin',
 //			{args: '--all --tags'},
