@@ -1,4 +1,5 @@
 var Backbone = require('backbone');
+var $ = require('jquery');
 var _ = require('underscore');
 var template = require('./template.hbs');
 var PreviewModel = require('components/preview/model');
@@ -41,12 +42,16 @@ module.exports = Backbone.View.extend({
 		this.listenTo(this.model, 'change:status', this.onChangeStatus);
 		this.listenTo(this.model, 'change:message', this.onChangeMessage);
 
+		$(window).on('hashchange', _.bind(this.onHashChange, this));
+
 		this.views.preview = new PreviewView({
 			model: new PreviewModel({psd: this.model.get('psd')})
 		});
 		this.views.layerslist = new LayersListView({
 			model: this.model.get('psd').get('layers')
 		});
+
+		this.onHashChange();
 	},
 
 	render: function() {
@@ -193,6 +198,15 @@ module.exports = Backbone.View.extend({
 			this.views.preview.setPosition(
 				-this.imageDrag.offsetX+event.originalEvent.screenX,
 				-this.imageDrag.offsetY+event.originalEvent.screenY);
+		}
+	},
+
+	onHashChange: function(event) {
+		var hash = window.location.hash.slice(1);
+		if (hash.length > 0) {
+			this.loadPSD(hash);
+		} else {
+			this.model.set('status', 'start');
 		}
 	}
 
