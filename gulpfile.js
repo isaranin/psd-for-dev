@@ -19,6 +19,8 @@ var filter		= require('gulp-filter');
 var tagVersion	= require('gulp-tag-version');
 var runSequence	= require('run-sequence');
 
+var log			= require('fancy-log');
+
 var env = process.env.ENV || 'production';
 var dev = (env === 'development');
 
@@ -36,7 +38,7 @@ console.info('Environment: ' + env);
 
 // error handler
 var errorHandler = function (error) {
-	console.error(error.toString());
+	log.error(error.toString());
 	// stop pipes
 	this.emit('end');
 };
@@ -135,7 +137,7 @@ gulp.task('http-server', function() {
 		livereload: dev
 	});
 
-    console.log('Server listening on http://localhost:8080');
+    log('Server listening on http://localhost:8080');
 });
 
 // watch task
