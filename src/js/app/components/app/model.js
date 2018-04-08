@@ -8,11 +8,11 @@ module.exports = Backbone.Model.extend({
 		return {
 			status: 'start',
 			message: '',
-			siteUrl: window.location.origin,
+			siteUrl: window.location.origin+window.location.pathname,
 			helpUrl: 'https://github.com/isaranin/psd-for-dev/issues',
 			author: 'Ivan Saranin',
 			authorEmail: 'ivan@saranin.co',
-			psd: null,
+			psd: null
 		};
 	},
 
