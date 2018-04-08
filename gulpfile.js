@@ -3,7 +3,6 @@ var gulp		= require('gulp');
 var clean		= require('gulp-clean');
 var sass		= require('gulp-sass');
 var sourcemaps	= require('gulp-sourcemaps');
-var connect		= require('gulp-connect');
 var uglify		= require('gulp-uglify');
 
 var argv		= require('yargs').argv;
@@ -18,6 +17,8 @@ var bump		= require('gulp-bump');
 var filter		= require('gulp-filter');
 var tagVersion	= require('gulp-tag-version');
 var runSequence	= require('run-sequence');
+
+var browserSync	= require('browser-sync').create();
 
 var log			= require('fancy-log');
 
@@ -65,25 +66,25 @@ gulp.task('build:assets', [
 gulp.task('build:assets:samples', function() {
 	return gulp.src('./test/psd-file/*.*')
 		.pipe(gulp.dest('./dist/samples/'))
-		.pipe(connect.reload());
+		.pipe(browserSync.stream());
 });
 
 gulp.task('build:assets:html', function() {
 	return gulp.src('./src/assets/*.html')
 		.pipe(gulp.dest('./dist'))
-		.pipe(connect.reload());
+		.pipe(browserSync.stream());
 });
 
 gulp.task('build:assets:jslibs', function() {
 	return gulp.src('./src/assets/*.js')
 		.pipe(gulp.dest('./dist/js/libs'))
-		.pipe(connect.reload());
+		.pipe(browserSync.stream());
 });
 
 gulp.task('build:assets:cssfonts', function() {
 	return gulp.src('./src/assets/fonts/**')
 		.pipe(gulp.dest('./dist/css/fonts'))
-		.pipe(connect.reload());
+		.pipe(browserSync.stream());
 });
 
 // task for build styles
@@ -93,7 +94,7 @@ gulp.task('build:styles', function() {
 		.pipe(sass().on('error', errorHandler))
 		.pipe(sourcemaps.write())
 		.pipe(gulp.dest('./dist/css'))
-		.pipe(connect.reload());
+		.pipe(browserSync.stream());
 });
 
 // task for build scripts
@@ -120,7 +121,7 @@ gulp.task('build:scripts', function() {
 		.pipe(gulpif(dev, uglify()))
 		.pipe(gulpif(dev, sourcemaps.write('./')))
 		.pipe(gulp.dest('./dist/js/'))
-		.pipe(connect.reload());
+		.pipe(browserSync.stream());
 });
 
 // task for clean dist folder
@@ -131,13 +132,12 @@ gulp.task('clean', function(done) {
 
 // task for server development
 gulp.task('http-server', function() {
-	connect.server({
-		root: './dist',
+	browserSync.init({
 		port: 8080,
-		livereload: dev
-	});
-
-    log('Server listening on http://localhost:8080');
+		open: true,
+		notify: false,
+		server: './dist/'
+    });
 });
 
 // watch task
@@ -165,7 +165,7 @@ gulp.task('deploy:bump', function(done) {
 		importance = 'major';
 	}
 	if (importance === '') {
-		console.error('Use minor/major/patch flag, like this gulp build --patch');
+		console.error('Use minor/major/patch flag, like this gulp deploy --patch');
 		return process.exit(0);
 	}
 	return gulp.src(['./package.json'])
