@@ -24,13 +24,14 @@ You can find [demo] here, or use [docker image].
 
 Quick start
 -----------
-###Git
+
+### Git
 
 	git clone https://github.com/isaranin/psd-for-dev.git
 	cd psd-for-dev/dist
 	open index.html
 
-###Node
+### Node
 
 Before you start, you need [node.js] and [npm].
 
@@ -46,7 +47,7 @@ More about [gulp], [node.js], [npm].
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com
 
-###Docker
+### Docker
 
 Before you start you should install [docker](https://www.docker.com/get-docker).
 
@@ -63,7 +64,7 @@ There are several gulp task to build, develop and deploy.
 All task has pramater `--production` or `--development`, so you can easely switch
 between ready to production version and unminifide version with sourcemaps.
 
-###Development
+### Development
 
 For better development process we have gulp task. Task watching on files and after
 changes rebuild js and css files, and relod browser.
@@ -76,14 +77,14 @@ We use [browsersync] for browser reload, so you can find app here
 
 [browsersync]: https://browsersync.io/
 
-###Build
+### Build
 
 This command will make new distributive at [./dist](./dist) folder.
 
 	gulb build
 
 
-###Deploy
+### Deploy
 
 Deploy process consist three steps, bump new version, build new distributive,
 commit and push changes to main repo.
@@ -108,6 +109,7 @@ Roadmap
 Credits
 -------
 Thanks my mom :)
+
 
 
 
