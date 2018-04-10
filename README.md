@@ -10,13 +10,13 @@ You can find [demo] here, or use [docker image].
 [docker image]: https://hub.docker.com/r/saranin/psd-for-dev
 
 1. [Quick start](#quick-start)
-	1. [Git] (#quick-start-with-git)
-	1. [Node] (#quick-start-with-node)
-	1. [Docker] (#quick-start-with-docker)
+	1. [Git](#git)
+	1. [Node](#node)
+	1. [Docker](#docker)
 1. [Working with](#working-with)
-	1. [Development] (#development)
-	1. [Build] (#build)
-	1. [Deploy] (#deploy)
+	1. [Development](#development)
+	1. [Build](#build)
+	1. [Deploy](#deploy)
 1. [Roadmap](#roadmap)
 1. [License](#license)
 1. [Creadits](#Credits)
@@ -24,12 +24,14 @@ You can find [demo] here, or use [docker image].
 
 Quick start
 -----------
-###Quick start with git
+###Git
+
 	git clone https://github.com/isaranin/psd-for-dev.git
 	cd psd-for-dev/dist
 	open index.html
 
-###Quick start with node
+###Node
+
 Before you start, you need [node.js] and [npm].
 
 	git clone https://github.com/isaranin/psd-for-dev.git
@@ -44,7 +46,8 @@ More about [gulp], [node.js], [npm].
 [node.js]: https://nodejs.org/en/
 [npm]: https://www.npmjs.com
 
-###Quick start with docker
+###Docker
+
 Before you start you should install [docker](https://www.docker.com/get-docker).
 
 	docker run -d -p 80:80 saranin/psd-for-dev
@@ -61,6 +64,7 @@ All task has pramater `--production` or `--development`, so you can easely switc
 between ready to production version and unminifide version with sourcemaps.
 
 ###Development
+
 For better development process we have gulp task. Task watching on files and after
 changes rebuild js and css files, and relod browser.
 
@@ -73,12 +77,14 @@ We use [browsersync] for browser reload, so you can find app here
 [browsersync]: https://browsersync.io/
 
 ###Build
+
 This command will make new distributive at [./dist](./dist) folder.
 
 	gulb build
 
 
 ###Deploy
+
 Deploy process consist three steps, bump new version, build new distributive,
 commit and push changes to main repo.
 
