@@ -1,4 +1,5 @@
 var browserify	= require('browserify');
+var watchify	= require('watchify');
 var gulp		= require('gulp');
 var clean		= require('gulp-clean');
 var sass		= require('gulp-sass');
@@ -24,6 +25,7 @@ var log			= require('fancy-log');
 
 var env = process.env.ENV || 'production';
 var dev = (env === 'development');
+var watch = false;
 
 // check arguments for state
 if (argv.production) {
@@ -103,25 +105,45 @@ gulp.task('build:scripts', function() {
 	hbsfy.configure({
 		extensions: ['hbs']
 	});
-
-	var b = browserify({
+	
+	var bundler = browserify({
 		entries: './src/js/app.js',
-		paths: ['./src/js/app/'],
+		paths: ['./src/js/app/', './src/js/libs/'],
 		debug: dev,
-		transform: [hbsfy]
+		transform: [hbsfy],
+		cache: {},
+		packageCache: {}
 	});
 
-	return b
-		.exclude('psd')
-		.bundle()
-		.on('error', errorHandler)
-		.pipe(source('app.js'))
-		.pipe(buffer())
-		.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
-		.pipe(gulpif(dev, uglify()))
-		.pipe(gulpif(dev, sourcemaps.write('./')))
-		.pipe(gulp.dest('./dist/js/'))
-		.pipe(browserSync.stream());
+	bundler.exclude('psd');
+
+	var rebundle = function() {
+		return bundler
+			.bundle()
+			.on('error', errorHandler)
+			.pipe(source('app.js'))
+			.pipe(buffer())
+			.pipe(gulpif(dev, sourcemaps.init({loadMaps: true})))
+			.pipe(gulpif(!dev, uglify()))
+			.pipe(gulpif(dev, sourcemaps.write('./')))
+			.pipe(gulp.dest('./dist/js/'))
+			.pipe(browserSync.stream());
+	};
+
+	if (watch) {
+		bundler.plugin(watchify, {
+			delay: 100,
+			ignoreWatch: ['**/node_modules/**'],
+			debug: dev,
+			poll: false
+		});
+		bundler
+			.on('log', log)
+			.on('update', rebundle);
+	}
+
+	return rebundle();
+
 });
 
 // task for clean dist folder
@@ -141,12 +163,14 @@ gulp.task('http-server', function() {
 });
 
 // watch task
-gulp.task('watch', ['build'], function() {
+gulp.task('watch', ['build:styles','build:assets'], function() {
 
 	process.on('uncaughtException', console.error.bind(console));
 
 	gulp.watch('./src/sass/**/*.scss', ['build:styles']);
-	gulp.watch('./src/js/**/*', ['build:scripts']);
+	watch = true;
+	gulp.start('build:scripts');
+	//gulp.watch('./src/js/**/*', ['build:scripts']);
 	gulp.watch(['./src/assets/**/*', './test/psd-file/*.*'], ['build:assets']);
 
     gulp.start('http-server');
