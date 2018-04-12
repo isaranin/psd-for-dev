@@ -1,5 +1,6 @@
 var Backbone = require('backbone');
 var $ = require('jquery');
+require('jquery.events');
 var _ = require('underscore');
 var template = require('./template.hbs');
 var PreviewModel = require('components/preview/model');
@@ -25,17 +26,12 @@ module.exports = Backbone.View.extend({
 		'dragenter': 'onDragStart',
 		'dragover': 'onDragOver',
 		'dragleave': 'onDragEnd',
+		'dragstart *': 'onChildsStartDrap',
 		'drop': 'onDrop',
 		'mousewheel #psd-preview': 'onMouseWheelPreview',
-		'mousedown #psd-preview': 'onMouseDownPreview',
-		'mousemove #psd-preview': 'onMouseMovePreview',
-		'mouseup #psd-preview': 'onMouseUpPreview'
-	},
-
-	imageDrag: {
-		dragging: false,
-		offsetX: 0,
-		offsetY: 0
+		'tapmove #psd-preview': 'onTapMove',
+		'click .button.menu': 'onMenuButtonClick',
+		'swipe': 'onSwipe'
 	},
 
 	initialize: function() {
@@ -100,7 +96,7 @@ module.exports = Backbone.View.extend({
 			} else if (dragItems[0].kind === 'file') {
 				func = 'fromEvent';
 				param = obj;
-			} else if (dragItems[0].kind == 'string') {
+			} else if (dragItems[0].kind === 'string') {
 				func = 'fromURL';
 				param = obj.dataTransfer.getData('text');
 			}
@@ -114,7 +110,6 @@ module.exports = Backbone.View.extend({
 				'message': 'You add wrong file.',
 				'status': 'message'
 			});
-			console.log(obj);
 		} else {
 			PSD[func](param).then(
 				_.bind(this.convertPSD, this),
@@ -135,6 +130,12 @@ module.exports = Backbone.View.extend({
 
 	onChangeMessage: function() {
 		this.$('#msg-message').html(this.model.get('message'));
+	},
+
+	onChildsStartDrap: function(e) {
+		e.preventDefault();
+		e.result = false;
+		return false;
 	},
 
 	onDragStart: function(e) {
@@ -173,32 +174,34 @@ module.exports = Backbone.View.extend({
 	},
 
 	onMouseWheelPreview: function(event) {
-		this.views.preview.increaseZoom(event.originalEvent.wheelDelta);
+		this.views.preview.increaseZoom(
+			event.originalEvent.wheelDelta/120, {
+				x: event.clientX,
+				y: event.clientY
+			});
 		event.preventDefault();
 	},
 
-	onMouseDownPreview: function(event) {
-		if (event.which === 1) {
-			this.imageDrag.dragging = true;
-			this.imageDrag.offsetX = event.originalEvent.screenX;
-			this.imageDrag.offsetY = event.originalEvent.screenY;
-			this.imageDrag.offsetX -= this.views.preview.model.get('left');
-			this.imageDrag.offsetY -= this.views.preview.model.get('top');
+	onTapMove: function(event, data) {
+		if (!data.delta.points.last || data.type !== 'move') {
+			return;
+		}
+		if (data.delta.points.last.length === 1) {
+			this.views.preview.moveBy(
+				-data.delta.points.last[0].clientX,
+				-data.delta.points.last[0].clientY
+			);
 		}
 	},
 
-	onMouseUpPreview: function(event) {
-		if (event.which === 1) {
-			this.imageDrag.dragging = false;
+	onSwipe: function(event, data) {
+		if (['left', 'right'].indexOf(data.direction) >= 0) {
+			this.$('#psd-layer-list').toggleClass('opened' , data.direction === 'left');
 		}
 	},
 
-	onMouseMovePreview: function(event) {
-		if (event.which === 1 && this.imageDrag.dragging) {
-			this.views.preview.setPosition(
-				-this.imageDrag.offsetX+event.originalEvent.screenX,
-				-this.imageDrag.offsetY+event.originalEvent.screenY);
-		}
+	onMenuButtonClick: function(event) {
+		this.$('#psd-layer-list').toggleClass('opened');
 	},
 
 	onHashChange: function(event) {
@@ -209,5 +212,4 @@ module.exports = Backbone.View.extend({
 			this.model.set('status', 'start');
 		}
 	}
-
 });

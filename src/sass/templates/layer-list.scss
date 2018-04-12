@@ -7,7 +7,7 @@
 	overflow-y: auto;
 	overflow-x: hidden;
 	z-index: 2;
-	
+
 	&::-webkit-scrollbar {
 		width: 7px;
 	}
@@ -56,7 +56,7 @@
 			}
 			& .button-fold {
 				@include ico(folder);
-				display: none;
+				visibility: hidden;
 			}
 
 			& .title {
@@ -64,6 +64,7 @@
 				cursor: default;
 				transition: color 0.5s;
 				margin-left:0.5em;
+				margin-right: 30px;
 			}
 
 			& .layer-list {
@@ -73,7 +74,7 @@
 				margin-right: -4px;
 			}
 			& .layer {
-				padding-left: 15px;
+				padding-left: 27px;
 
 			}
 
@@ -88,12 +89,13 @@
 			}
 			&.layer-group{
 				&>.button-fold {
-					display: inline-block;
+					visibility: visible;
 				}
 				&.layer-folded{
 
 					&>.button-fold {
 						@include ico(folder-open);
+						//visibility: visible;
 					}
 					&>.layer-list {
 						display: block;
